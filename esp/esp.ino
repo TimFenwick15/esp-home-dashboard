@@ -1,4 +1,5 @@
 #include "credentials.h"
+#include "html.h"
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WiFi.h>
 #include <math.h>
@@ -31,22 +32,20 @@ uint32_t white = 0xFFFFFF;
 
 WiFiServer server(80);
 String header;
-int measuredTemperature;
+sensorData data;
 
 void setup() {
   //Serial.begin(115200);
-  //Serial.print("Connecting to ");
-  //Serial.println(ssid);
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
-  //Serial.println("");
-  //Serial.println("WiFi connected.");
-  //Serial.println("IP address: ");
-  //Serial.println(WiFi.localIP());
   server.begin();
-  measuredTemperature = temperature();
+  //Serial.println(WiFi.localIP());
+  data.temperature = temperature();
+  delay(1000);
+  strip.begin();
+  delay(1000);
 }
 
 void loop(){
@@ -59,7 +58,7 @@ void loop(){
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        //Serial.write(c);                    // print it out the serial monitor
+        //Serial.write(c);
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           if (currentLine.length() == 0) {
@@ -87,38 +86,8 @@ void loop(){
               setColour = true;
               colour = black;
             }
-            
-            // Display the HTML web page
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
 
-            // CSS
-            client.println("<style>html { font-family: Helvetica; display: inline-block; height: 100%; text-align: center; font-size: 30px; color: black;}");
-            client.println("body {height: 100%; margin: 0; padding: 0;}");
-            client.println(".seventhheight {height: calc(100% / 7); margin: 0 0}");
-            client.println(".fill {width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".redbutton { background-color: #FF0000; }");
-            client.println(".greenbutton { background-color: #00FF00;}");
-            client.println(".purplebutton { background-color: #551A8B;}");
-            client.println(".pinkbutton { background-color: #FC0FC0;}");
-            client.println(".whitebutton { background-color: #FFFFFF;}");
-            client.println(".blackbutton { background-color: #000000;}");
-            client.println("</style></head><body>");
-
-            // Page content
-            client.println("<p class=\"seventhheight\">");
-            client.println(measuredTemperature);
-            client.println(" degrees</p>");
-            
-            client.println("<p class=\"seventhheight\"><a href=\"/red\"><button class=\"redbutton fill\"></button></a></p>");
-            client.println("<p class=\"seventhheight\"><a href=\"/green\"><button class=\"greenbutton fill\"></button></a></p>");    
-            client.println("<p class=\"seventhheight\"><a href=\"/purple\"><button class=\"purplebutton fill\"></button></a></p>");
-            client.println("<p class=\"seventhheight\"><a href=\"/pink\"><button class=\"pinkbutton fill\"></button></a></p>");
-            client.println("<p class=\"seventhheight\"><a href=\"/white\"><button class=\"whitebutton fill\"></button></a></p>");
-            client.println("<p class=\"seventhheight\"><a href=\"/black\"><button class=\"blackbutton fill\"></button></a></p>");
-            client.println("</body></html>");
-            
+            client.println(makeHTML(data));
             // The HTTP response ends with another blank line
             client.println();
             // Break out of the while loop
@@ -147,12 +116,9 @@ void loop(){
 
 int temperature(void) {
   float R,T,L;
-  //digitalWrite(THERMISTOR_SOURCE_PIN, HIGH);
-  //delay(500); // Try without this
   R = R_Balance * (V_SOURCE * TEN_BIT_MAX / float(analogRead(THERMISTOR_ADC_PIN)) - 1.0f);
   T = 1.0f / (1.0f / T0 + log(R / R0) / B);
   T = T - ZERO_CELCIUS;
-  //digitalWrite(THERMISTOR_SOURCE_PIN, LOW);
   return (int) T;
 }
 

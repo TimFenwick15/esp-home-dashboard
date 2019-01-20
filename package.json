@@ -1,0 +1,20 @@
+{
+  "name": "esp-home-dashboard",
+  "version": "1.0.0",
+  "description": "A webpage served by an Adafruit ESP8266 Feather Huzzah. Used to set colours on a Neopixel strip, and report temperature from a 503 thermistor.",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimFenwick15/esp-home-dashboard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TimFenwick15/esp-home-dashboard/issues"
+  },
+  "homepage": "https://github.com/TimFenwick15/esp-home-dashboard#readme"
+}
