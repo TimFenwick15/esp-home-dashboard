@@ -1,9 +1,26 @@
 #include "credentials.h"
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WiFi.h>
+#include <math.h>
+
+/*
+ * Temperature Defines
+ */
+#define ZERO_CELCIUS (273.15f)
+#define R_Balance (9850.0f) // 10K +- 5% resistor
+#define T0 (ZERO_CELCIUS + 25)
+#define B (4300.0f) // I didn't have a datasheet for my thermistor, this value is in the correct region
+#define R0 (53000.0f) // Resistance can be +- 10%, this value worked for my thermistor
+#define TEN_BIT_MAX (1023.0f)
+#define V_SOURCE (3.3f)
+
+#define THERMISTOR_ADC_PIN (A0)
+#define THERMISTOR_SOURCE_PIN (12)
 #define NEOPIXEL_PIN (14)
 #define NUMBER_OF_LEDS (30)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+int temperature(void);
 
 uint32_t green = 0x00FF00;
 uint32_t red = 0xFF0000;
@@ -12,10 +29,9 @@ uint32_t pink = 0xFC0FC0;
 uint32_t black = 0x000000;
 uint32_t white = 0xFFFFFF;
 
-//const char* ssid     = "Colress4Zero";
-//const char* password = "lorddonald";
 WiFiServer server(80);
 String header;
+int measuredTemperature;
 
 void setup() {
   //Serial.begin(115200);
@@ -24,13 +40,13 @@ void setup() {
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    //Serial.print(".");
   }
   //Serial.println("");
   //Serial.println("WiFi connected.");
   //Serial.println("IP address: ");
   //Serial.println(WiFi.localIP());
   server.begin();
+  measuredTemperature = temperature();
 }
 
 void loop(){
@@ -39,7 +55,6 @@ void loop(){
   bool setColour = false;
   
   if (client) {                             // If a new client connects,
-    //Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
@@ -79,22 +94,29 @@ void loop(){
             client.println("<link rel=\"icon\" href=\"data:,\">");
 
             // CSS
-            client.println("<style>html { font-family: Helvetica; display: inline-block; height: 100%; text-align: center;}body{height: 100%; margin: 0; padding: 0;}");
-            client.println(".sixthheight {height: calc(100% / 6); margin: 0 0}");
-            client.println(".redbutton { background-color: #FF0000; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".greenbutton { background-color: #00FF00; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".purplebutton { background-color: #551A8B; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".pinkbutton { background-color: #FC0FC0; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".whitebutton { background-color: #FFFFFF; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println(".blackbutton { background-color: #000000; width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}</style></head><body>");
+            client.println("<style>html { font-family: Helvetica; display: inline-block; height: 100%; text-align: center; font-size: 30px; color: black;}");
+            client.println("body {height: 100%; margin: 0; padding: 0;}");
+            client.println(".seventhheight {height: calc(100% / 7); margin: 0 0}");
+            client.println(".fill {width: 100%; height: 100%; border: none; color: white; padding: 0px 0px;}");
+            client.println(".redbutton { background-color: #FF0000; }");
+            client.println(".greenbutton { background-color: #00FF00;}");
+            client.println(".purplebutton { background-color: #551A8B;}");
+            client.println(".pinkbutton { background-color: #FC0FC0;}");
+            client.println(".whitebutton { background-color: #FFFFFF;}");
+            client.println(".blackbutton { background-color: #000000;}");
+            client.println("</style></head><body>");
+
+            // Page content
+            client.println("<p class=\"seventhheight\">");
+            client.println(measuredTemperature);
+            client.println(" degrees</p>");
             
-            client.println("<p class=\"sixthheight\"><a href=\"/red\"><button class=\"redbutton\"></button></a></p>");
-            client.println("<p class=\"sixthheight\"><a href=\"/green\"><button class=\"greenbutton\"></button></a></p>");    
-            client.println("<p class=\"sixthheight\"><a href=\"/purple\"><button class=\"purplebutton\"></button></a></p>");
-            client.println("<p class=\"sixthheight\"><a href=\"/pink\"><button class=\"pinkbutton\"></button></a></p>");
-            client.println("<p class=\"sixthheight\"><a href=\"/white\"><button class=\"whitebutton\"></button></a></p>");
-            client.println("<p class=\"sixthheight\"><a href=\"/black\"><button class=\"blackbutton\"></button></a></p>");
+            client.println("<p class=\"seventhheight\"><a href=\"/red\"><button class=\"redbutton fill\"></button></a></p>");
+            client.println("<p class=\"seventhheight\"><a href=\"/green\"><button class=\"greenbutton fill\"></button></a></p>");    
+            client.println("<p class=\"seventhheight\"><a href=\"/purple\"><button class=\"purplebutton fill\"></button></a></p>");
+            client.println("<p class=\"seventhheight\"><a href=\"/pink\"><button class=\"pinkbutton fill\"></button></a></p>");
+            client.println("<p class=\"seventhheight\"><a href=\"/white\"><button class=\"whitebutton fill\"></button></a></p>");
+            client.println("<p class=\"seventhheight\"><a href=\"/black\"><button class=\"blackbutton fill\"></button></a></p>");
             client.println("</body></html>");
             
             // The HTTP response ends with another blank line
@@ -113,8 +135,6 @@ void loop(){
     header = "";
     // Close the connection
     client.stop();
-    //Serial.println("Client disconnected.");
-    //Serial.println("");
   }
   if (setColour) {
     strip.begin();
@@ -122,6 +142,17 @@ void loop(){
       strip.setPixelColor(i, colour);
     }
     strip.show();
-  }
+  } 
+}
+
+int temperature(void) {
+  float R,T,L;
+  //digitalWrite(THERMISTOR_SOURCE_PIN, HIGH);
+  //delay(500); // Try without this
+  R = R_Balance * (V_SOURCE * TEN_BIT_MAX / float(analogRead(THERMISTOR_ADC_PIN)) - 1.0f);
+  T = 1.0f / (1.0f / T0 + log(R / R0) / B);
+  T = T - ZERO_CELCIUS;
+  //digitalWrite(THERMISTOR_SOURCE_PIN, LOW);
+  return (int) T;
 }
 
