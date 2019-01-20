@@ -1,10 +1,7 @@
-console.log('working')
-
-// minify index.html
-var minify = require('html-minifier').minify;
+const minify = require('html-minifier').minify;
 const fs = require('fs')
 const html = fs.readFileSync('index.html', 'utf8')
-var result = minify(html, {
+let result = minify(html, {
   removeComments: true,
   collapseWhitespace: true,
   minifyCSS: true
@@ -20,17 +17,6 @@ String makeHTML(sensorData data) {
   return String("${result[0]}") + data.temperature + String("${result[1]}");
 }
 `
-fs.writeFileSync('esp/html.h', result)
-
-"aaa".replace()
-
-//console.log(result)
-
-// split it on {{...}}
-
-// #define first part
-
-// #define second part
-
-// This isn't extendable...
-
+const output = `esp/html.h`
+fs.writeFileSync(output, result)
+console.log(`Successfully written to ${output}`)

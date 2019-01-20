@@ -42,10 +42,7 @@ void setup() {
   }
   server.begin();
   //Serial.println(WiFi.localIP());
-  data.temperature = temperature();
-  delay(1000);
   strip.begin();
-  delay(1000);
 }
 
 void loop(){
@@ -86,11 +83,17 @@ void loop(){
               setColour = true;
               colour = black;
             }
-
-            client.println(makeHTML(data));
-            // The HTTP response ends with another blank line
-            client.println();
-            // Break out of the while loop
+            
+            data.temperature = temperature();
+            
+            if (header.indexOf("GET /temperature") >= 0) {
+              client.println(data.temperature);
+            }
+            else {
+              client.println(makeHTML(data));
+            }
+            
+            client.println(); // The HTTP response ends with another blank line
             break;
           } else { // if you got a newline, then clear currentLine
             currentLine = "";
