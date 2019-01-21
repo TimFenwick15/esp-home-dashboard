@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "node build.js",
+    "verify": "arduino_debug --verify esp/esp.ino",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/TimFenwick15/esp-home-dashboard/issues"
   },
-  "homepage": "https://github.com/TimFenwick15/esp-home-dashboard#readme"
+  "homepage": "https://github.com/TimFenwick15/esp-home-dashboard#readme",
+  "dependencies": {
+    "html-minifier": "^3.5.21"
+  }
 }

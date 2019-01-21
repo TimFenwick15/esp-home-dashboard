@@ -1,8 +1,12 @@
 #include "credentials.h"
 #include "html.h"
+#include "weather.h"
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include <math.h>
+
+#define _SERIAL_LOGGING
 
 /*
  * Temperature Defines
@@ -19,9 +23,11 @@
 #define THERMISTOR_SOURCE_PIN (12)
 #define NEOPIXEL_PIN (14)
 #define NUMBER_OF_LEDS (30)
+
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 int temperature(void);
+String weather(void);
 
 uint32_t green = 0x00FF00;
 uint32_t red = 0xFF0000;
@@ -35,14 +41,19 @@ String header;
 sensorData data;
 
 void setup() {
-  //Serial.begin(115200);
+#ifdef SERIAL_LOGGING
+  Serial.begin(115200);
+#endif
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
   server.begin();
-  //Serial.println(WiFi.localIP());
   strip.begin();
+#ifdef SERIAL_LOGGING
+  Serial.println(WiFi.localIP());
+#endif
+
 }
 
 void loop(){
@@ -55,7 +66,9 @@ void loop(){
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        //Serial.write(c);
+#ifdef SERIAL_LOGGING
+        Serial.write(c);
+#endif 
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           if (currentLine.length() == 0) {
@@ -85,6 +98,7 @@ void loop(){
             }
             
             data.temperature = temperature();
+            data.weather = weather();
             
             if (header.indexOf("GET /temperature") >= 0) {
               client.println(data.temperature);
@@ -123,5 +137,39 @@ int temperature(void) {
   T = 1.0f / (1.0f / T0 + log(R / R0) / B);
   T = T - ZERO_CELCIUS;
   return (int) T;
+}
+
+String weather(void) {
+  uint8_t weatherCount = 8;
+  uint8_t i;
+  uint8_t result;
+  weatherType response = noWeather;
+  HTTPClient http;
+  int httpResponseCode;
+  String httpResponseBody;
+  String summarySubstring;
+  String summary;
+  http.begin(WEATHER_API_URL);
+  httpResponseCode = http.GET();
+  if (httpResponseCode == 200) {
+    httpResponseBody = http.getString();
+    http.end();
+    summarySubstring = httpResponseBody.substring(httpResponseBody.indexOf("description\":\"") + 14);
+    summary = summarySubstring.substring(0, summarySubstring.indexOf("\""));
+    summary.toLowerCase();
+    if (summary.indexOf("sun") != -1) {
+      response = sunny;
+    }
+    if ((summary.indexOf("cloud") != -1) || (summary.indexOf("overcast") != -1) || (summary.indexOf("fog") != -1)) {
+      response = cloudy;
+    }
+    if (summary.indexOf("rain") != -1) {
+      response = rainy;
+    }
+    if (summary.indexOf("snow") != -1) {
+      response = snowy;
+    }
+  }
+  return weatherText[response];
 }
 

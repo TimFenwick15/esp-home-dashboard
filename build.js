@@ -9,14 +9,32 @@ let result = minify(html, {
 
 result = result.replace(/"/g, `'`) 
 result = result.split(`{{TEMPERATURE}}`)
+const htmlPart1 = result[0]
+result = result[1].split(`{{WEATHER}}`)
+const htmlPart2 = result[0]
+const htmlPart3 = result[1]
 result = `
 typedef struct {
   int temperature;
+  String weather;
 } sensorData;
 String makeHTML(sensorData data) {
-  return String("${result[0]}") + data.temperature + String("${result[1]}");
+  return String("${htmlPart1}") + data.temperature + String("${htmlPart2}") + data.weather + String("${htmlPart3}");
 }
 `
 const output = `esp/html.h`
 fs.writeFileSync(output, result)
+
 console.log(`Successfully written to ${output}`)
+console.log(`Verifying Arduino code...`)
+
+const { exec } = require('child_process');
+exec(`arduino_debug --verify esp/esp.ino`, (err, stdout, stderr) => {
+  console.log(stdout)
+  if (err) {
+    console.log("The Arduino code did not compile successfully.")
+  }
+  else {
+    console.log(`Arduino code compiled with no issues.`)
+  }
+})
