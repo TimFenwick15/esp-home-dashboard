@@ -99,6 +99,7 @@ void loop(){
             
             data.temperature = temperature();
             data.weather = weather();
+            data.weatherTemperature = 0;
             
             if (header.indexOf("GET /temperature") >= 0) {
               client.println(data.temperature);
@@ -160,7 +161,12 @@ String weather(void) {
     if (summary.indexOf("sun") != -1) {
       response = sunny;
     }
-    if ((summary.indexOf("cloud") != -1) || (summary.indexOf("overcast") != -1) || (summary.indexOf("fog") != -1)) {
+    if (
+      (summary.indexOf("cloud") != -1) ||
+      (summary.indexOf("overcast") != -1) ||
+      (summary.indexOf("fog") != -1) ||
+      (summary.indexOf("mist") != -1) ||
+      (summary.indexOf("haze") != -1)) {
       response = cloudy;
     }
     if (summary.indexOf("rain") != -1) {

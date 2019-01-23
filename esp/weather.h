@@ -8,9 +8,9 @@ typedef enum {
 } weatherType;
 
 String weatherText[weatherMax] = {
-  String("No weather data"),
-  String("Sunny"),
-  String("Cloudy"),
-  String("Rain"),
-  String("Snow")
+  String("noweatherdata"),
+  String("sunny"),
+  String("cloudy"),
+  String("rain"),
+  String("snow")
 };

@@ -17,6 +17,16 @@ This will also run "arduino_debug" to verify that the Arduino code compiles. Thi
 ## credentials.h
 esp/credentials.h must exist for the Arduino code to compile. A credentials.example.h is included. Enter your WiFi name and password in this file, leaving the "" in place, and rename this file to credentials.h.
 
+## Build process
+- index.html is minified
+- Template text is replaced with a struct member so the ESP can send the complete webpage
+- The weather icon is chosen by:
+  - making each icon display: none
+  - giving it a class name describing what weather type it represents
+  - makign a display: block class with a template name
+  - replace this template name with data.weather so the C code can pick which icon to switch to display: block
+  - There's probably a better way to do this...
+
 ## Sources
 The esp.h webserver code is based on https://randomnerdtutorials.com/esp8266-web-server/ :heart:
 
@@ -27,3 +37,4 @@ An example 503 thermistor data sheet can be found here: https://www.jameco.com/J
 ## Todo
 - Wouldn't ideally have 0-1V across the thermistor constantly. Supply 3V3 on read only?
 - Step down 5V Neopixel supply to 3V3
+- Make snow and 
