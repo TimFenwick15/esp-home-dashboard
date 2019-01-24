@@ -163,6 +163,7 @@ String weather(void) {
     }
     if (
       (summary.indexOf("cloud") != -1) ||
+      (summary.indexOf("clear") != -1) ||
       (summary.indexOf("overcast") != -1) ||
       (summary.indexOf("fog") != -1) ||
       (summary.indexOf("mist") != -1) ||

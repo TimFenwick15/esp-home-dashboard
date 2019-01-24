@@ -17,6 +17,12 @@ This will also run "arduino_debug" to verify that the Arduino code compiles. Thi
 ## credentials.h
 esp/credentials.h must exist for the Arduino code to compile. A credentials.example.h is included. Enter your WiFi name and password in this file, leaving the "" in place, and rename this file to credentials.h.
 
+credentials.h also includes a weather API URL. The weather API being used is OpenWeatherMap. The url should be:
+
+http://api.openweathermap.org/data/2.5/forecast?q={your location},uk&APPID={your API key}
+
+where {your location} and {your API key} are replaced with your details. More information on this can be found at https://openweathermap.org/api
+
 ## Build process
 - index.html is minified
 - Template text is replaced with a struct member so the ESP can send the complete webpage
