@@ -11,6 +11,9 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      font-family: 'Helvetica';
+      text-decoration: none;
+      font-size: 30px
     }
     .lights {
       width: 100%;
@@ -26,14 +29,17 @@
       position: relative;
     }
     .content {
-      width: 90%;
-      height: 90%;
+      width: 80%;
+      height: 80%;
       margin: auto;
     }
     .weathericon {
       display: none;
     }
     .SHOWWEATHER {
+      display: block;
+    }
+    .cloudy {
       display: block;
     }
 </style>
@@ -59,15 +65,15 @@
     <div class="text">{{TEMPERATURE}}&deg;C</div>
   </div>
   <div class="data">
-    <!-- Cloud -->
+    <!-- Cloudy -->
     <svg class="content weathericon cloudy" viewBox="0 0 500 500">
-      <circle cx="120" cy="250" r="120" fill="#d3d3d3" />
-      <circle cx="380" cy="250" r="120" fill="#d3d3d3" />
-      <circle cx="250" cy="125" r="120" fill="#d3d3d3" />
-      <rect x="120" y="240" width="260" height="130" fill="#d3d3d3" />
+      <circle cx="120" cy="310" r="120" fill="#d3d3d3" />
+      <circle cx="380" cy="310" r="120" fill="#d3d3d3" />
+      <circle cx="250" cy="185" r="120" fill="#d3d3d3" />
+      <rect x="120" y="300" width="260" height="130" fill="#d3d3d3" />
     </svg>
 
-    <!-- Sun -->
+    <!-- Sunny -->
     <svg class="content weathericon sunny" viewBox="0 0 500 500">
         <circle cx ="250" cy="250" r="190" fill="#d3d3d3" />
         <rect x="0" y="235" width="30" height="30" fill="#d3d3d3" />
@@ -80,10 +86,25 @@
         <polygon points="61 417, 83 395, 105 417, 83 439" fill="#d3d3d3" />
       </svg>
 
-      <!-- Raindrop -->
-
-      <!-- Snowflake -->
-
+      <!-- Rainy -->
+      <svg class="content weathericon rainy" viewBox="0 0 500 500">
+        <circle cx="120" cy="250" r="120" fill="#d3d3d3" />
+        <circle cx="380" cy="250" r="120" fill="#d3d3d3" />
+        <circle cx="250" cy="125" r="120" fill="#d3d3d3" />
+        <rect x="120" y="240" width="260" height="130" fill="#d3d3d3" />
+        <path d="M150 390, L160 410, M170 430, L180 450, M230 410, L240 430, M250 450, L260 470, M310 390, L320 410, M330 430, L340 450" stroke="#d3d3d3" stroke-width="8" />
+      </svg>
+  
+      <!-- Snowy -->
+      <svg class="content weathericon snowy" viewBox="0 0 500 500">
+        <circle cx="120" cy="250" r="120" fill="#d3d3d3" />
+        <circle cx="380" cy="250" r="120" fill="#d3d3d3" />
+        <circle cx="250" cy="125" r="120" fill="#d3d3d3" />
+        <rect x="120" y="240" width="260" height="130" fill="#d3d3d3" />
+        <circle cx="160" cy="420" r="30" fill="#d3d3d3" />
+        <circle cx="320" cy="450" r="30" fill="#d3d3d3" />
+      </svg>
+  
     <div class="text">{{WEATHERTEMPERATURE}}&deg;C</div>
   </div>
   <div class="SHOWWEATHER"></div> <!-- This is needed to stop html-minifier removing the unused class -->

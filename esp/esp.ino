@@ -26,8 +26,8 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-int temperature(void);
-String weather(void);
+void temperature(sensorData* data);
+void weather(sensorData* data);
 
 uint32_t green = 0x00FF00;
 uint32_t red = 0xFF0000;
@@ -35,10 +35,13 @@ uint32_t purple = 0x800080;
 uint32_t pink = 0xFC0FC0;
 uint32_t black = 0x000000;
 uint32_t white = 0xFFFFFF;
+uint32_t yellow = 0xFFFF00;
+uint32_t orange = 0xFFA500;
+uint32_t blue = 0x0000FF;
 
 WiFiServer server(80);
 String header;
-sensorData data;
+//sensorData data;
 
 void setup() {
 #ifdef SERIAL_LOGGING
@@ -60,7 +63,8 @@ void loop(){
   WiFiClient client = server.available();   // Listen for incoming clients
   uint32_t colour;
   bool setColour = false;
-  
+  sensorData data;
+
   if (client) {                             // If a new client connects,
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
@@ -95,11 +99,18 @@ void loop(){
             } else if (header.indexOf("GET /black") >= 0) {
               setColour = true;
               colour = black;
+            } else if (header.indexOf("GET /yellow") >= 0) {
+              setColour = true;
+              colour = yellow;
+            } else if (header.indexOf("GET /orange") >= 0) {
+              setColour = true;
+              colour = orange;
+            } else if (header.indexOf("GET /blue") >= 0) {
+              setColour = true;
+              colour = blue;
             }
-            
-            data.temperature = temperature();
-            data.weather = weather();
-            data.weatherTemperature = 0;
+            temperature(&data);
+            weather(&data);
             
             if (header.indexOf("GET /temperature") >= 0) {
               client.println(data.temperature);
@@ -132,15 +143,15 @@ void loop(){
   } 
 }
 
-int temperature(void) {
+void temperature(sensorData* data) {
   float R,T,L;
   R = R_Balance * (V_SOURCE * TEN_BIT_MAX / float(analogRead(THERMISTOR_ADC_PIN)) - 1.0f);
   T = 1.0f / (1.0f / T0 + log(R / R0) / B);
   T = T - ZERO_CELCIUS;
-  return (int) T;
+  data->temperature = (int) T;
 }
 
-String weather(void) {
+void weather(sensorData* data) {
   uint8_t weatherCount = 8;
   uint8_t i;
   uint8_t result;
@@ -150,16 +161,19 @@ String weather(void) {
   String httpResponseBody;
   String summarySubstring;
   String summary;
+  String temperatureSubstring;
+  String temperature;
   http.begin(WEATHER_API_URL);
   httpResponseCode = http.GET();
   if (httpResponseCode == 200) {
     httpResponseBody = http.getString();
-    http.end();
     summarySubstring = httpResponseBody.substring(httpResponseBody.indexOf("description\":\"") + 14);
     summary = summarySubstring.substring(0, summarySubstring.indexOf("\""));
     summary.toLowerCase();
+
+    // Get the weather type
     if (summary.indexOf("sun") != -1) {
-      response = sunny;
+      data->weather = weatherText[sunny];
     }
     if (
       (summary.indexOf("cloud") != -1) ||
@@ -168,15 +182,22 @@ String weather(void) {
       (summary.indexOf("fog") != -1) ||
       (summary.indexOf("mist") != -1) ||
       (summary.indexOf("haze") != -1)) {
-      response = cloudy;
+      data->weather = weatherText[cloudy];
     }
     if (summary.indexOf("rain") != -1) {
-      response = rainy;
+      data->weather = weatherText[rainy];
     }
     if (summary.indexOf("snow") != -1) {
-      response = snowy;
+      data->weather = weatherText[snowy];
     }
+
+    // Get the temperature
+    //temperatureSubstring = httpResponseBody.substring(httpResponseBody.indexOf("temp\":\"") + 7);
+    //temperature = temperatureSubstring.substring(0, summarySubstring.indexOf("\""));
+    //temperature.toLowerCase();
+    //data->weatherTemperature = temperature;
+    data->weatherTemperature = String("0");
   }
-  return weatherText[response];
+  http.end();
 }
 

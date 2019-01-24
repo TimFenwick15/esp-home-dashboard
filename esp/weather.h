@@ -11,6 +11,6 @@ String weatherText[weatherMax] = {
   String("noweatherdata"),
   String("sunny"),
   String("cloudy"),
-  String("rain"),
-  String("snow")
+  String("rainy"),
+  String("snowy")
 };

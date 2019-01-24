@@ -15,7 +15,7 @@ result = `
 typedef struct {
   int temperature;
   String weather;
-  int weatherTemperature;
+  String weatherTemperature;
 } sensorData;
 String makeHTML(sensorData data) {
   return String("${result}");
