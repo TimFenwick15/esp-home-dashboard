@@ -8,14 +8,14 @@ let result = minify(html, {
 })
 
 result = result.replace(/"/g, `'`)
-result = result.replace(`{{TEMPERATURE}}`, `") + data.temperature + String("`)
-result = result.replace(`{{WEATHERTEMPERATURE}}`, `") + data.weatherTemperature + String("`)
-result = result.replace(`SHOWWEATHER`, `") + data.weather + String("`)
+result = result.replace(/TEMPLATE_TEMPERATURE/g, `") + data.temperature + String("`)
+result = result.replace(/TEMPLATE_WEATHERTEMPERATURE/g, `") + data.weatherTemperature + String("`)
+result = result.replace(/TEMPLATE_SHOWWEATHER/g, `") + data.weather + String("`)
 result = `
 typedef struct {
   int temperature;
   String weather;
-  String weatherTemperature;
+  int weatherTemperature;
 } sensorData;
 String makeHTML(sensorData data) {
   return String("${result}");

@@ -162,7 +162,7 @@ void weather(sensorData* data) {
   String summarySubstring;
   String summary;
   String temperatureSubstring;
-  String temperature;
+  int temperature;
   http.begin(WEATHER_API_URL);
   httpResponseCode = http.GET();
   if (httpResponseCode == 200) {
@@ -192,11 +192,10 @@ void weather(sensorData* data) {
     }
 
     // Get the temperature
-    //temperatureSubstring = httpResponseBody.substring(httpResponseBody.indexOf("temp\":\"") + 7);
-    //temperature = temperatureSubstring.substring(0, summarySubstring.indexOf("\""));
-    //temperature.toLowerCase();
-    //data->weatherTemperature = temperature;
-    data->weatherTemperature = String("0");
+    temperatureSubstring = httpResponseBody.substring(httpResponseBody.indexOf("temp\":") + 6);
+    temperature = temperatureSubstring.substring(0, summarySubstring.indexOf(".")).toInt(); // Use . as delim to drop decimal points
+    temperature = temperature - (int)ZERO_CELCIUS;
+    data->weatherTemperature = temperature;
   }
   http.end();
 }

@@ -16,14 +16,14 @@
       font-size: 30px
     }
     .lights {
+      height: 64vh;
       width: 100%;
-      height: 64%;
       display: inline-block;
       text-align: center;
     }
     .data {
       width: 49%;
-      height: 34%;
+      height: 34vh;
       display: inline-block;
       text-align: center;
       position: relative;
@@ -36,10 +36,7 @@
     .weathericon {
       display: none;
     }
-    .SHOWWEATHER {
-      display: block;
-    }
-    .cloudy {
+    .TEMPLATE_SHOWWEATHER {
       display: block;
     }
 </style>
@@ -62,7 +59,7 @@
       <rect x="0" y="250" height="250" width="500" fill="#d3d3d3" />
       <rect x="360" y="100" height="80" width="50" fill="#d3d3d3" />
     </svg>
-    <div class="text">{{TEMPERATURE}}&deg;C</div>
+    <div class="text">TEMPLATE_TEMPERATURE&deg;C</div>
   </div>
   <div class="data">
     <!-- Cloudy -->
@@ -105,7 +102,7 @@
         <circle cx="320" cy="450" r="30" fill="#d3d3d3" />
       </svg>
   
-    <div class="text">{{WEATHERTEMPERATURE}}&deg;C</div>
+    <div class="text">TEMPLATE_WEATHERTEMPERATURE&deg;C</div>
   </div>
-  <div class="SHOWWEATHER"></div> <!-- This is needed to stop html-minifier removing the unused class -->
+  <div class="TEMPLATE_SHOWWEATHER"></div> <!-- This is needed to stop html-minifier removing the unused class -->
 </body></head></html>

@@ -29,7 +29,7 @@ where {your location} and {your API key} are replaced with your details. More in
 - The weather icon is chosen by:
   - making each icon display: none
   - giving it a class name describing what weather type it represents
-  - makign a display: block class with a template name
+  - making a display: block class with a template name
   - replace this template name with data.weather so the C code can pick which icon to switch to display: block
   - There's probably a better way to do this...
 
@@ -43,4 +43,3 @@ An example 503 thermistor data sheet can be found here: https://www.jameco.com/J
 ## Todo
 - Wouldn't ideally have 0-1V across the thermistor constantly. Supply 3V3 on read only?
 - Step down 5V Neopixel supply to 3V3
-- Make snow and 
