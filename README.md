@@ -43,3 +43,5 @@ An example 503 thermistor data sheet can be found here: https://www.jameco.com/J
 ## Todo
 - Wouldn't ideally have 0-1V across the thermistor constantly. Supply 3V3 on read only?
 - Step down 5V Neopixel supply to 3V3
+- Make it look better
+- Make network requests while idling, not on recieving requests

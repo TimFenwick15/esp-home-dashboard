@@ -8,17 +8,20 @@ let result = minify(html, {
 })
 
 result = result.replace(/"/g, `'`)
-result = result.replace(/TEMPLATE_TEMPERATURE/g, `") + data.temperature + String("`)
-result = result.replace(/TEMPLATE_WEATHERTEMPERATURE/g, `") + data.weatherTemperature + String("`)
-result = result.replace(/TEMPLATE_SHOWWEATHER/g, `") + data.weather + String("`)
+result = `client.println(String("${result}`
+result = result.replace(/TEMPLATE_TEMPERATURE/g, `") + data.temperature);client.println(String("`)
+result = result.replace(/TEMPLATE_WEATHERTEMPERATURE/g, `") + data.weatherTemperature);client.println(String("`)
+result = result.replace(/TEMPLATE_SHOWWEATHER/g, `") + data.weather);client.println(String("`)
+result = result + `"));`
 result = `
+#include <ESP8266WiFi.h>
 typedef struct {
   int temperature;
   String weather;
   int weatherTemperature;
 } sensorData;
-String makeHTML(sensorData data) {
-  return String("${result}");
+void makeHTML(WiFiClient client, sensorData data) {
+  ${result}
 }
 `
 const output = `esp/html.h`

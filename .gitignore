@@ -2,3 +2,4 @@ credentials.h
 node_modules
 .vscode
 esp/html.h
+package-lock.json

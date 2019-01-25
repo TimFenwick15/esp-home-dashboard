@@ -6,7 +6,7 @@
 #include <ESP8266HTTPClient.h>
 #include <math.h>
 
-#define _SERIAL_LOGGING
+#define SERIAL_LOGGING
 
 /*
  * Temperature Defines
@@ -41,7 +41,6 @@ uint32_t blue = 0x0000FF;
 
 WiFiServer server(80);
 String header;
-//sensorData data;
 
 void setup() {
 #ifdef SERIAL_LOGGING
@@ -116,7 +115,7 @@ void loop(){
               client.println(data.temperature);
             }
             else {
-              client.println(makeHTML(data));
+              makeHTML(client, data);
             }
             
             client.println(); // The HTTP response ends with another blank line
@@ -184,16 +183,18 @@ void weather(sensorData* data) {
       (summary.indexOf("haze") != -1)) {
       data->weather = weatherText[cloudy];
     }
-    if (summary.indexOf("rain") != -1) {
+    if (
+      (summary.indexOf("rain") != -1) ||
+      (summary.indexOf("drizzle") != -1)) {
       data->weather = weatherText[rainy];
     }
     if (summary.indexOf("snow") != -1) {
       data->weather = weatherText[snowy];
     }
-
+    Serial.println(data->weather);
     // Get the temperature
     temperatureSubstring = httpResponseBody.substring(httpResponseBody.indexOf("temp\":") + 6);
-    temperature = temperatureSubstring.substring(0, summarySubstring.indexOf(".")).toInt(); // Use . as delim to drop decimal points
+    temperature = temperatureSubstring.substring(0, temperatureSubstring.indexOf(".")).toInt(); // Use . as delim to drop decimal points
     temperature = temperature - (int)ZERO_CELCIUS;
     data->weatherTemperature = temperature;
   }
