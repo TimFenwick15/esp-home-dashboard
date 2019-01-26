@@ -1,3 +1,7 @@
+/**
+ * Includes
+ */
+
 #include "credentials.h"
 #include "html.h"
 #include "weather.h"
@@ -6,11 +10,13 @@
 #include <ESP8266HTTPClient.h>
 #include <math.h>
 
-#define SERIAL_LOGGING
-
-/*
- * Temperature Defines
+/**
+ * Macros
  */
+
+#define SERIAL_LOGGING
+#define COUNTER_MAX (600) // 10 minutes of 100ms loops
+
 #define ZERO_CELCIUS (273.15f)
 #define R_Balance (9850.0f) // 10K +- 5% resistor
 #define T0 (ZERO_CELCIUS + 25)
@@ -24,23 +30,36 @@
 #define NEOPIXEL_PIN (14)
 #define NUMBER_OF_LEDS (30)
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+#define GREEN (0x00FF00)
+#define RED (0xFF0000)
+#define PURPLE (0x800080)
+#define PINK (0xFC0FC0)
+#define BLACK (0x000000)
+#define WHITE (0xFFFFFF)
+#define YELLOW (0xFFFF00)
+#define ORANGE (0xFFA500)
+#define BLUE (0x0000FF)
 
-void temperature(sensorData* data);
-void weather(sensorData* data);
+/**
+ * Function prototypes
+ */
 
-uint32_t green = 0x00FF00;
-uint32_t red = 0xFF0000;
-uint32_t purple = 0x800080;
-uint32_t pink = 0xFC0FC0;
-uint32_t black = 0x000000;
-uint32_t white = 0xFFFFFF;
-uint32_t yellow = 0xFFFF00;
-uint32_t orange = 0xFFA500;
-uint32_t blue = 0x0000FF;
+static void temperature(sensorData* data);
+static void weather(sensorData* data);
 
-WiFiServer server(80);
-String header;
+/**
+ * Local varaibles
+ */
+
+static Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMBER_OF_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+static WiFiServer server(80);
+static sensorData data;
+static String header;
+static uint16_t counter = COUNTER_MAX; // Initialise to counter max so our network request runs on start up
+
+/**
+ * Function definitions
+ */
 
 void setup() {
 #ifdef SERIAL_LOGGING
@@ -55,14 +74,12 @@ void setup() {
 #ifdef SERIAL_LOGGING
   Serial.println(WiFi.localIP());
 #endif
-
 }
 
 void loop(){
   WiFiClient client = server.available();   // Listen for incoming clients
   uint32_t colour;
   bool setColour = false;
-  sensorData data;
 
   if (client) {                             // If a new client connects,
     String currentLine = "";                // make a String to hold incoming data from the client
@@ -82,34 +99,32 @@ void loop(){
           
             if (header.indexOf("GET /green") >= 0) {
               setColour = true;
-              colour = green;
+              colour = GREEN;
             } else if (header.indexOf("GET /red") >= 0) {
               setColour = true;
-              colour = red;
+              colour = RED;
             } else if (header.indexOf("GET /purple") >= 0) {
               setColour = true;
-              colour = purple;
+              colour = PURPLE;
             } else if (header.indexOf("GET /pink") >= 0) {
               setColour = true;
-              colour = pink;
+              colour = PINK;
             } else if (header.indexOf("GET /white") >= 0) {
               setColour = true;
-              colour = white;
+              colour = WHITE;
             } else if (header.indexOf("GET /black") >= 0) {
               setColour = true;
-              colour = black;
+              colour = BLACK;
             } else if (header.indexOf("GET /yellow") >= 0) {
               setColour = true;
-              colour = yellow;
+              colour = YELLOW;
             } else if (header.indexOf("GET /orange") >= 0) {
               setColour = true;
-              colour = orange;
+              colour = ORANGE;
             } else if (header.indexOf("GET /blue") >= 0) {
               setColour = true;
-              colour = blue;
+              colour = BLUE;
             }
-            temperature(&data);
-            weather(&data);
             
             if (header.indexOf("GET /temperature") >= 0) {
               client.println(data.temperature);
@@ -139,18 +154,26 @@ void loop(){
       strip.setPixelColor(i, colour);
     }
     strip.show();
-  } 
+  }
+
+  counter++;
+  if (counter > COUNTER_MAX) {
+    counter = 0;
+    temperature(&data);
+    weather(&data);
+  }
+  delay(100);
 }
 
-void temperature(sensorData* data) {
-  float R,T,L;
+static void temperature(sensorData* data) {
+  float R, T, L;
   R = R_Balance * (V_SOURCE * TEN_BIT_MAX / float(analogRead(THERMISTOR_ADC_PIN)) - 1.0f);
   T = 1.0f / (1.0f / T0 + log(R / R0) / B);
   T = T - ZERO_CELCIUS;
   data->temperature = (int) T;
 }
 
-void weather(sensorData* data) {
+static void weather(sensorData* data) {
   uint8_t weatherCount = 8;
   uint8_t i;
   uint8_t result;
@@ -200,4 +223,3 @@ void weather(sensorData* data) {
   }
   http.end();
 }
-

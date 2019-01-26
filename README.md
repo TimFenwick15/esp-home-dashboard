@@ -33,15 +33,30 @@ where {your location} and {your API key} are replaced with your details. More in
   - replace this template name with data.weather so the C code can pick which icon to switch to display: block
   - There's probably a better way to do this...
 
+## Todo
+- Wouldn't ideally have 0-1V across the thermistor constantly. Supply 3V3 on read only?
+- Step down 5V Neopixel supply to 3V3
+- Make it look better
+- Make a build only task
+
+## Learns
+### HTML/CSS
+- SVG (rect, circle, path, polygon, <a> tags around elements can be used to make elements click-able, viewBox="0 0 X Y" makes SVG scale)
+- "vertical-align: top;" is needed to properly align inline-block elements in some cases
+- html-minify very useful for this type of project
+
+### Hardware
+- 503 thermistors
+- Feather Huzzah memory fills quickly when receiving large payloads
+- client.println() truncates after a certain length
+- arduino_debug --verify
+- Neopixels don't respond well to VCC > Vdata
+
 ## Sources
 The esp.h webserver code is based on https://randomnerdtutorials.com/esp8266-web-server/ :heart:
 
 Information on using thermistors was taken from https://arduino.stackexchange.com/questions/6875/how-to-use-503-thermistors-for-temperature :heart:
 
-An example 503 thermistor data sheet can be found here: https://www.jameco.com/Jameco/Products/ProdDS/207002.pdf
+Help on misaligned inline-block elements https://stackoverflow.com/questions/19366401/my-inline-block-elements-are-not-lining-up-properly :heart:
 
-## Todo
-- Wouldn't ideally have 0-1V across the thermistor constantly. Supply 3V3 on read only?
-- Step down 5V Neopixel supply to 3V3
-- Make it look better
-- Make network requests while idling, not on recieving requests
+An example 503 thermistor data sheet can be found here: https://www.jameco.com/Jameco/Products/ProdDS/207002.pdf

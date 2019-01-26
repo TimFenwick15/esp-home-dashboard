@@ -11,7 +11,7 @@ result = result.replace(/"/g, `'`)
 result = `client.println(String("${result}`
 result = result.replace(/TEMPLATE_TEMPERATURE/g, `") + data.temperature);client.println(String("`)
 result = result.replace(/TEMPLATE_WEATHERTEMPERATURE/g, `") + data.weatherTemperature);client.println(String("`)
-result = result.replace(/TEMPLATE_SHOWWEATHER/g, `") + data.weather);client.println(String("`)
+result = result.replace(/TEMPLATE_SHOWWEATHER/, `") + data.weather);client.println(String("`)
 result = result + `"));`
 result = `
 #include <ESP8266WiFi.h>
@@ -28,7 +28,7 @@ const output = `esp/html.h`
 fs.writeFileSync(output, result)
 
 console.log(`Successfully written to ${output}`)
-console.log(`Verifying Arduino code...`)
+/*console.log(`Verifying Arduino code...`)
 
 const { exec } = require('child_process');
 exec(`arduino_debug --verify esp/esp.ino`, (err, stdout, stderr) => {
@@ -40,4 +40,4 @@ exec(`arduino_debug --verify esp/esp.ino`, (err, stdout, stderr) => {
   else {
     console.log(`Arduino code compiled with no issues.`)
   }
-})
+})*/
