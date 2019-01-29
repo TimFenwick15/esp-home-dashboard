@@ -65,6 +65,7 @@ void setup() {
 #ifdef SERIAL_LOGGING
   Serial.begin(115200);
 #endif
+  WiFi.mode(WIFI_STA); // Otherwise the ESP will show as an open access point
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);

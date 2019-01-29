@@ -51,6 +51,7 @@ where {your location} and {your API key} are replaced with your details. More in
 - client.println() truncates after a certain length
 - arduino_debug --verify
 - Neopixels don't respond well to VCC > Vdata
+- ESP8266 appears as an open WiFi network unless you call WiFi.mode(WIFI_STA); before WiFi.begin
 
 ## Sources
 The esp.h webserver code is based on https://randomnerdtutorials.com/esp8266-web-server/ :heart:
